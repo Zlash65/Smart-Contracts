@@ -17,6 +17,7 @@ contract shoppingSmartContract {
     
 	mapping(address => Seller) sellers;
 	mapping(bytes32 => Product) products;
+	mapping(address => bytes32) productSold;
 	address admin;
 	uint32 productCount;
 
@@ -63,8 +64,15 @@ contract shoppingSmartContract {
 		productCount++;
 	}
 
-	function getProductCount() public onlyAdmin returns (uint32) {
+	function getProductCount() public returns (uint32) {
 		return productCount;
+	}
+
+	function buyProduct(bytes32 _id) public payable {
+		require(products[_id].productId[0]!=0, "Product with given id does not exist.");
+		require(products[_id].price==msg.value, "Product price does not match with paid value.");
+
+		productSold[msg.sender] = _id;
 	}
 
 }
