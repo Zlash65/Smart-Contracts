@@ -15,17 +15,19 @@ contract shoppingSmartContract {
 		uint256 price;
 	}
     
-	mapping(address => Seller) sellers;
-	mapping(bytes32 => Product) products;
-	mapping(address => bytes32) productSold;
+	mapping(address => Seller) sellers; // sellers mapping
+	mapping(bytes32 => Product) products; // products mapping
+	mapping(address => bytes32) productSold; // sold history mapping
 	address admin;
 	uint32 productCount;
 
+	// modifier to check if its an admin account
 	modifier onlyAdmin() {
 		require(msg.sender == admin, "Admin access required");
 		_;
 	}
 
+	// modifier to check if the account is whitelisted seller
 	modifier onlyWhitelistedSeller() {
 		require(sellers[msg.sender].sellerAddress != address(0), "Seller does not exist");
 		require(sellers[msg.sender].whitelisted == true, "Only whitelisted Seller can add products");
@@ -46,14 +48,16 @@ contract shoppingSmartContract {
 		sellers[msg.sender] = seller;
 	}
 
-	function makeSellerWhitelisted(address sellerId) public onlyAdmin {
+	// only admin can call this function to whitelist a seller address
+	function WhitelistAddress(address sellerId) public onlyAdmin {
 		require(sellers[sellerId].sellerAddress != msg.sender, "Seller with the given address does not exist.");
 		require(sellers[sellerId].sellerAddress != address(0), "Seller with the given address does not exist.");
 
 		sellers[sellerId].whitelisted = true;
 	}
 
-	function addProduct(bytes32 _id, uint256 _price) public onlyWhitelistedSeller {
+	// only a registered whitelisted seller can add products
+	function AddProduct(bytes32 _id, uint256 _price) public onlyWhitelistedSeller {
 		// check if product already added
 		require(products[_id].productId != _id, "Product with the given id already exist.");
 
@@ -64,17 +68,20 @@ contract shoppingSmartContract {
 		productCount++;
 	}
 
-	function getProductCount() public returns (uint32) {
+	// retreive number of products added
+	function GetContentCount() public returns (uint32) {
 		return productCount;
 	}
 
-	function buyProduct(bytes32 _id) public payable {
+	// buy a product by its id and paying its exact price
+	function BuyContent(bytes32 _id) public payable {
 		require(products[_id].productId[0]!=0, "Product with given id does not exist.");
 		require(products[_id].price==msg.value, "Product price does not match with paid value.");
 
 		productSold[msg.sender] = _id;
 	}
 
+	// check if an address has bought any product or not
 	function BuyCheck(address from, bytes32 _id) public onlyAdmin returns (bool status) {
 		return productSold[from] == _id;
 	}
