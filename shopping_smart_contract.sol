@@ -19,10 +19,35 @@ contract shoppingSmartContract {
 	mapping(uint32 => Productt) products;
 	address admin;
 	uint32 productCount;
+
+	modifier onlyAdmin() {
+		require(msg.sender == admin, "only Admin can whitelist a seller");
+		_;
+	}
+
+	modifier onlyWhitelistedSeller() {
+		require(sellers[msg.sender].sellerAddress != "", "Whitelisted seller can add products");
+		_;
+	}
     
     // make creator of contract as admin
 	constructor(shoppingSmartContract) internal {
 		admin = msg.sender;
+	}
+
+	// public visible function to register yourself as seller
+	function addAsSeller() public returns (bool status) {
+		// check if seller already registered
+		require(sellers[msg.sender].sellerAddress!="", "Already added as seller.");
+
+		Seller memory seller = Seller(msg.sender, new uint32[](0), false);
+		sellers[msg.sender] = seller;
+	}
+
+	function makeSellerWhitelisted(address sellerId) public onlyAdmin {
+		require(sellers[sellerId].sellerAddress!="", "Seller with the given address does not exist.");
+
+		sellers[sellerId].whitelisted = true;
 	}
 
 }
