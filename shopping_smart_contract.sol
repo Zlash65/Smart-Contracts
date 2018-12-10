@@ -22,7 +22,7 @@ contract shoppingSmartContract {
 	uint32 productCount;
 
 	modifier onlyAdmin() {
-		require(msg.sender == admin, "only Admin can whitelist a seller");
+		require(msg.sender == admin, "Admin access required");
 		_;
 	}
 
@@ -73,6 +73,10 @@ contract shoppingSmartContract {
 		require(products[_id].price==msg.value, "Product price does not match with paid value.");
 
 		productSold[msg.sender] = _id;
+	}
+
+	function BuyCheck(address from, bytes32 _id) public onlyAdmin returns (bool status) {
+		return productSold[from] == _id;
 	}
 
 }
