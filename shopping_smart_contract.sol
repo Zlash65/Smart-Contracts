@@ -17,7 +17,8 @@ contract shoppingSmartContract {
     
 	mapping(address => Seller) sellers; // sellers mapping
 	mapping(bytes32 => Product) products; // products mapping
-	mapping(address => bytes32) productSold; // sold history mapping
+// 	mapping(address => bytes32) productSold; // sold history mapping
+	mapping(address => bytes32[]) productSold; // sold history mapping
 	address admin;
 	uint32 productCount;
 
@@ -78,12 +79,22 @@ contract shoppingSmartContract {
 		require(products[_id].productId[0]!=0, "Product with given id does not exist.");
 		require(products[_id].price==msg.value, "Product price does not match with paid value.");
 
-		productSold[msg.sender] = _id;
+// 		productSold[msg.sender] = _id;
+		productSold[msg.sender].push(_id);
+		
 	}
 
 	// check if an address has bought any product or not
 	function BuyCheck(address from, bytes32 _id) public onlyAdmin returns (bool status) {
-		return productSold[from] == _id;
+// 		return productSold[from] == _id;
+
+		for (uint i = 0; i < productSold[from].length; i++) {
+			if(productSold[from][i] == _id){
+				return true;
+			}
+		}
+        
+		return false;
 	}
 
 }
