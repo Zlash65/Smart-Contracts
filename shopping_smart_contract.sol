@@ -88,6 +88,9 @@ contract shoppingSmartContract {
 	function BuyCheck(address from, bytes32 _id) public onlyAdmin returns (bool status) {
 // 		return productSold[from] == _id;
 
+		// validate if the product id exist or not
+		require(products[_id].productId[0]!=0, "Product with given id does not exist.");
+
 		for (uint i = 0; i < productSold[from].length; i++) {
 			if(productSold[from][i] == _id){
 				return true;
