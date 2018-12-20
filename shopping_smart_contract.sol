@@ -1,6 +1,12 @@
 pragma solidity >=0.4.22 <0.6.0;
 
 contract shoppingSmartContract {
+
+	// Keeping Logs of Transactions
+	event eventAddAsSeller(bytes32 message, address seller);
+	event eventWhitelistAddress(bytes32 message, address seller);
+	event eventAddProduct(bytes32 message, bytes32 productId, uint256 price, address seller);
+	event eventBuyContent(bytes32 message, bytes32 productId, uint256 price, address buyer);
     
     // struct to hold various kind of data for seller
 	struct Seller {
@@ -46,6 +52,7 @@ contract shoppingSmartContract {
 
 		Seller memory seller = Seller(msg.sender, new bytes32[](0), false);
 		sellers[msg.sender] = seller;
+		emit eventAddAsSeller("Added as Seller", msg.sender);
 	}
 
 	// only admin can call this function to whitelist a seller address
@@ -54,6 +61,7 @@ contract shoppingSmartContract {
 		require(sellers[sellerId].sellerAddress != address(0), "Seller with the given address does not exist.");
 
 		sellers[sellerId].whitelisted = true;
+		emit eventWhitelistAddress("Seller whitelisted", sellerId);
 	}
 
 	// only a registered whitelisted seller can add products
@@ -66,6 +74,7 @@ contract shoppingSmartContract {
 // 		Seller memory seller = sellers[msg.sender];
 // 		seller.productsData.push(prod);
 		productCount++;
+		emit eventAddProduct("Product added", _id, _price, msg.sender);
 	}
 
 	// retreive number of products added
@@ -79,6 +88,7 @@ contract shoppingSmartContract {
 		require(products[_id].price==msg.value, "Product price does not match with paid value.");
 
 		productSold[msg.sender][_id] = true;
+		emit eventBuyContent("Product bought", _id, msg.value, msg.sender);
 	}
 
 	// check if an address has bought any product or not
